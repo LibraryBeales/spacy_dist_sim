@@ -4,7 +4,7 @@ import logging
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
-INPUT_FOLDER = r"your_input_folder"
+INPUT_FOLDER = r"scraped_policy_docs"
 OUTPUT_FOLDER = r"clean_text"
 
 Path(OUTPUT_FOLDER).mkdir(exist_ok=True)
