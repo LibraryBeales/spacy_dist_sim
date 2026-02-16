@@ -1,54 +1,68 @@
+import spacy
 from pathlib import Path
-import pdfplumber
-import logging
+from collections import Counter, defaultdict
+import math
 
-logging.getLogger("pdfminer").setLevel(logging.ERROR)
+TEXT_FOLDER = r"clean_text"
 
-INPUT_FOLDER = r"your_input_folder"
-OUTPUT_FOLDER = r"clean_text"
+seed_words = {"law","act","statute","amendment","ordinance","legislation","bill"}
+window = 5
 
-Path(OUTPUT_FOLDER).mkdir(exist_ok=True)
+nlp = spacy.load("en_core_web_lg", disable=["ner"])
 
-def read_pdf(path):
-    try:
-        text = []
-        with pdfplumber.open(path) as pdf:
-            for page in pdf.pages:
-                t = page.extract_text()
-                if t:
-                    text.append(t)
-        return "\n".join(text)
-    except:
-        print("BAD PDF:", path.name)
-        return ""
+def text_stream(folder):
+    for p in Path(folder).glob("*.txt"):
+        try:
+            yield p.read_text(encoding="utf-8", errors="ignore")
+        except:
+            continue
 
-def read_txt(path):
-    try:
-        return path.read_text(encoding="utf-8", errors="ignore")
-    except:
-        return ""
+word_contexts = defaultdict(Counter)
 
-count = 0
+doc_count = 0
 
-for p in Path(INPUT_FOLDER).glob("*"):
-    if p.suffix.lower() == ".pdf":
-        text = read_pdf(p)
+for doc in nlp.pipe(text_stream(TEXT_FOLDER), batch_size=50):
+    doc_count += 1
+    if doc_count % 500 == 0:
+        print("Processed:", doc_count)
 
-    elif p.suffix.lower() == ".txt":
-        text = read_txt(p)
+    tokens = [t for t in doc if t.is_alpha and not t.is_stop]
 
-    else:
+    for i, tok in enumerate(tokens):
+        lemma = tok.lemma_.lower()
+
+        start = max(0, i-window)
+        end = min(len(tokens), i+window+1)
+
+        for j in range(start, end):
+            if j != i:
+                word_contexts[lemma][tokens[j].lemma_.lower()] += 1
+
+print("Docs processed:", doc_count)
+
+seed_context = Counter()
+for w in seed_words:
+    seed_context += word_contexts[w]
+
+def cosine(a, b):
+    common = set(a) & set(b)
+    num = sum(a[x]*b[x] for x in common)
+    sum1 = sum(v*v for v in a.values())
+    sum2 = sum(v*v for v in b.values())
+    denom = math.sqrt(sum1)*math.sqrt(sum2)
+    return num/denom if denom else 0
+
+scores = {}
+
+for word, ctx in word_contexts.items():
+    if word in seed_words:
         continue
 
-    if not text.strip():
-        continue
+    sim = cosine(ctx, seed_context)
+    if sim > 0.2:
+        scores[word] = sim
 
-    out_name = p.stem + ".txt"
-    out_path = Path(OUTPUT_FOLDER) / out_name
-    out_path.write_text(text, encoding="utf-8")
+print("\nWords used like legal terms:\n")
 
-    count += 1
-    if count % 500 == 0:
-        print("Converted:", count)
-
-print("Done. Total text files:", count)
+for w, s in sorted(scores.items(), key=lambda x: x[1], reverse=True)[:80]:
+    print(f"{w:20} {s:.3f}")
