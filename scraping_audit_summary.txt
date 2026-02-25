@@ -1,0 +1,13 @@
+POLICY SCRAPING AUDIT SUMMARY
+=====================================================================================
+
+Total URLs: 6,987
+Unique URLs: 6,397
+Saved Documents: 4,796
+Missing: 2,191 (31.4%)
+
+Reasons for missing documents:
+1. Exact duplicate URLs (same URL listed multiple times): 590 (26.9%)
+2. Canonical duplicates (same page, different URL parameters): 262 (12.0%)
+3. Scraping errors (404, 403, timeouts, connection issues): 2,234 (102.0%)
+4. Empty or very small files (likely failed downloads): 189 (8.6%)

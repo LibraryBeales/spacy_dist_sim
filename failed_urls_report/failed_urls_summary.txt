@@ -1,0 +1,35 @@
+FAILED URLs SUMMARY REPORT
+=====================================================================================
+
+Total Failed URLs: 2,234
+
+Breakdown by Error Type:
+-------------------------------------------------------------------------------------
+Other_Error.............................    875 ( 39.2%)
+403_Forbidden...........................    445 ( 19.9%)
+404_Not_Found...........................    415 ( 18.6%)
+Connection_Error........................    249 ( 11.1%)
+Timeout.................................    185 (  8.3%)
+503_Service_Unavailable.................     26 (  1.2%)
+401_Unauthorized........................     14 (  0.6%)
+SSL_Certificate_Error...................     12 (  0.5%)
+500_Server_Error........................      7 (  0.3%)
+502_Bad_Gateway.........................      4 (  0.2%)
+Connection_Refused......................      2 (  0.1%)
+
+=====================================================================================
+
+ERROR CATEGORY DESCRIPTIONS:
+-------------------------------------------------------------------------------------
+404_Not_Found:           Page doesn't exist or was removed
+403_Forbidden:           Access denied (IP blocked, authentication required)
+401_Unauthorized:        Authentication required
+500_Server_Error:        Server-side error
+Timeout:                 Server didn't respond in time
+Connection_Error:        Network connection issues
+Connection_Refused:      Server refused connection
+SSL_Certificate_Error:   SSL/TLS certificate problems
+DNS_Error:               Domain name resolution failed
+Read_Timeout:            Server stopped responding during download
+Max_Retries_Exceeded:    Too many failed retry attempts
+Other_Error:             Miscellaneous errors
